@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os/exec"
+	"strings"
 	"time"
 )
 
@@ -50,6 +51,9 @@ func listen(history []string, histfile string, persist bool, max int) error {
 			// wl-paste exits 1 if there's no selection (e.g., when running it at OS startup)
 			if string(t) != "No selection\n" {
 				log.Printf("Error running wl-paste (demon.52): %s", t)
+				if strings.HasPrefix(string(t), "free()") {
+					notify("clipman", "Clipman: double free. Please take note of what you were doing and file a bug", "critical", 20*time.Second)
+				}
 			}
 			time.Sleep(1 * time.Second)
 			continue
@@ -90,7 +94,7 @@ func listen(history []string, histfile string, persist bool, max int) error {
 		// dump history to file so that other apps can query it
 		err = write(history, histfile)
 		if err != nil {
-			return fmt.Errorf("Error writing history (demon.83): %s", err)
+			return fmt.Errorf("error writing history (demon.83): %s", err)
 		}
 
 		if persist {

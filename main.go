@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"path"
+	"time"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -43,8 +44,10 @@ func main() {
 	if *asDemon {
 		persist := !*noPersist
 		if err := listen(history, histfile, persist, *max); err != nil {
+			notify("clipman", "Clipman: bad exit (see log). If unexpected, please take note of what you were doing and file a bug", "critical", 20*time.Second)
 			log.Fatal(err)
 		}
+		notify("clipman", "Clipman: clean exit. If unexpected, please take note of what you were doing and file a bug", "critical", 20*time.Second)
 	} else if *asSelector {
 		if err := selector(history, *max, *tool); err != nil {
 			log.Fatal(err)
