@@ -34,7 +34,7 @@ var (
 	clearToolArgs = clearer.Flag("tool-args", "Extra arguments to pass to the --tool").Short('T').Default("").String()
 	clearAll      = clearer.Flag("all", "Remove all items").Short('a').Default("false").Bool()
 
-	restorer = app.Command("restore", "Serve the last recorded item from history")
+	_ = app.Command("restore", "Serve the last recorded item from history")
 )
 
 func main() {

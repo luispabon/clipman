@@ -43,7 +43,7 @@ func selector(data []string, max int, tool string, prompt string, toolsArgs stri
 	case "wofi":
 		args = []string{"wofi", "-p", prompt, "--cache-file", "/dev/null", "--dmenu"}
 	default:
-		return "", fmt.Errorf("Unsupported tool: %s", tool)
+		return "", fmt.Errorf("unsupported tool: %s", tool)
 	}
 
 	args = append(args, strings.Fields(toolsArgs)...)
@@ -66,9 +66,7 @@ func selector(data []string, max int, tool string, prompt string, toolsArgs stri
 		return "", nil
 	}
 
-	selected := string(b[:len(b)-1]) // drop newline added by dmenu/rofi/wofi
-
-	sel, ok := guide[selected]
+	sel, ok := guide[string(b[:len(b)-1])] // drop newline added by dmenu/roi/wofi
 	if !ok {
 		return "", errors.New("couldn't recover original string")
 	}
