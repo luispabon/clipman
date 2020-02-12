@@ -1,5 +1,9 @@
 # Next
 
+**Breaking changes**
+
+- the selector's tool now defaults to wofi, rather than the obsolete dmenu
+
 **New features**
 
 - add support for bemenu selector, a multi backend dmenu clone
