@@ -1,3 +1,5 @@
+// GPL v3.0
+// 2019- (C) yory8 <yory8@users.noreply.github.com>
 package main
 
 import (
