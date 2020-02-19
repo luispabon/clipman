@@ -7,6 +7,7 @@
 **New features**
 
 - add support for bemenu selector, a multi backend dmenu clone
+- add a man page
 
 # 1.2.0
 
