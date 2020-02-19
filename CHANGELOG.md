@@ -9,6 +9,10 @@
 - add support for bemenu selector, a multi backend dmenu clone
 - add a man page
 
+**Notable Bug fixes**
+
+- some input were skipped because not recognized as text
+
 # 1.2.0
 
 **New features**

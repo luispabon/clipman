@@ -169,7 +169,8 @@ func serveTxt(s string) {
 		log.Printf("couldn't find wl-copy: %v\n", err)
 	}
 
-	cmd := exec.Cmd{Path: bin, Stdin: strings.NewReader(s)}
+	// we mandate the mime type because we know we can only serve text; not doing this leads to weird bugs like #35
+	cmd := exec.Cmd{Path: bin, Args: []string{bin, "-t", "TEXT"}, Stdin: strings.NewReader(s)}
 	if err := cmd.Run(); err != nil {
 		log.Printf("error running wl-copy: %s\n", err)
 	}
