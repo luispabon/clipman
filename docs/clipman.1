@@ -1,4 +1,4 @@
-.TH clipman 1 1.2.0 ""
+.TH clipman 1 1.3.0 ""
 .SH "NAME"
 clipman
 .SH "SYNOPSIS"
@@ -33,15 +33,15 @@ history size
 \fB-P, --no-persist\fR
 Don't persist a copy buffer after a program exits
 .SS
-\fBpick [<flags>]\fR
+\fBpick --tool=TOOL [<flags>]\fR
 .PP
 Pick an item from clipboard history
 .TP
 \fB--max-items=15\fR
 scrollview length
 .TP
-\fB-t, --tool="wofi"\fR
-Which selector to use: dmenu/bemenu/rofi/wofi/STDOUT
+\fB-t, --tool=TOOL\fR
+Which selector to use: wofi/bemenu/dmenu/rofi/STDOUT
 .TP
 \fB-T, --tool-args=""\fR
 Extra arguments to pass to the --tool
@@ -53,8 +53,8 @@ Remove item/s from history
 \fB--max-items=15\fR
 scrollview length
 .TP
-\fB-t, --tool="wofi"\fR
-Which selector to use: dmenu/bemenu/rofi/wofi/STDOUT
+\fB-t, --tool=TOOL\fR
+Which selector to use: wofi/bemenu/dmenu/rofi/STDOUT
 .TP
 \fB-T, --tool-args=""\fR
 Extra arguments to pass to the --tool
@@ -69,11 +69,13 @@ Serve the last recorded item from history
 Run the binary in your Sway session by adding `exec wl-paste -t text --watch clipman store` (or `exec wl-paste -t text --watch clipman store 1>> PATH/TO/LOGFILE 2>&1 &` to log errors) at the beginning of your config.
 For primary clipboard support, also add `exec wl-paste -p -t text --watch clipman store --histpath="~/.local/share/clipman-primary.json`.
 .PP
-To query the history and select items, run the binary as `clipman pick`. You can assign it to a keybinding: `bindsym $mod+h exec clipman pick`.
-For primary clipboard support, `clipman pick --histpath="~/.local/share/clipman-primary.json`.
+To query the history and select items, run the binary as `clipman pick -t wofi`. You can assign it to a keybinding: `bindsym $mod+h exec clipman pick -t wofi`.
+For primary clipboard support, `clipman pick -t wofi --histpath="~/.local/share/clipman-primary.json`.
 .PP
-To remove items from history, `clipman clear` and `clipman clear --all`.
+To remove items from history, `clipman clear -t wofi` and `clipman clear --all`.
 .PP
 To serve the last history item at startup, add `exec clipman restore` to your Sway config.
 .SH "KNOWN ISSUES"
-All items stored in history are treated as plain text. This means that, unless you run with the `--no-persist` option, you'll always immediately lose rich content: for example, if you copy formatted text inside Libre Office you'll lose all formatting on paste.
+All items stored in history are treated as plain text.
+.PP
+By default, we continue serving the last copied item even after its owner has exited. This means that, unless you run with the `--no-persist` option, you'll always immediately lose rich content: for example, if you copy formatted text inside Libre Office you'll lose all formatting on paste; or, if you copy a bookmark in Firefox, you won't be able to paste it in another bookmark folder.

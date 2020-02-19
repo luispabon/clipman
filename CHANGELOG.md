@@ -1,8 +1,8 @@
-# Next
+# 1.3.0
 
 **Breaking changes**
 
-- the selector's tool now defaults to wofi, rather than the obsolete dmenu
+- we don't set a default tool anymore for picking/clearing the history
 
 **New features**
 
@@ -11,7 +11,7 @@
 
 **Notable Bug fixes**
 
-- some input were skipped because not recognized as text
+- some input was not served because it wasn't recognized as text
 
 # 1.2.0
 

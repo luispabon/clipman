@@ -15,7 +15,7 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
-const version = "1.2.0"
+const version = "1.3.0"
 
 var (
 	app      = kingpin.New("clipman", "A clipboard manager for Wayland")
@@ -27,12 +27,12 @@ var (
 
 	picker       = app.Command("pick", "Pick an item from clipboard history")
 	maxPicker    = picker.Flag("max-items", "scrollview length").Default("15").Int()
-	pickTool     = picker.Flag("tool", "Which selector to use: wofi/bemenu/dmenu/rofi/STDOUT").Short('t').Default("wofi").String()
+	pickTool     = picker.Flag("tool", "Which selector to use: wofi/bemenu/dmenu/rofi/STDOUT").Short('t').Required().String()
 	pickToolArgs = picker.Flag("tool-args", "Extra arguments to pass to the --tool").Short('T').Default("").String()
 
-	clearer       = app.Command("clear", "Remove item(s) from history")
+	clearer       = app.Command("clear", "Remove item/s from history")
 	maxClearer    = clearer.Flag("max-items", "scrollview length").Default("15").Int()
-	clearTool     = clearer.Flag("tool", "Which selector to use: wofi/bemenu/dmenu/rofi/STDOUT").Short('t').Default("wofi").String()
+	clearTool     = clearer.Flag("tool", "Which selector to use: wofi/bemenu/dmenu/rofi/STDOUT").Short('t').String()
 	clearToolArgs = clearer.Flag("tool-args", "Extra arguments to pass to the --tool").Short('T').Default("").String()
 	clearAll      = clearer.Flag("all", "Remove all items").Short('a').Default("false").Bool()
 
@@ -91,6 +91,11 @@ func main() {
 				log.Fatal(err)
 			}
 			return
+		}
+
+		if *clearTool == "" {
+			fmt.Println("clipman: error: required flag --tool or --all not provided, try --help")
+			os.Exit(1)
 		}
 
 		selection, err := selector(history, *maxClearer, *clearTool, "clear", *clearToolArgs)
