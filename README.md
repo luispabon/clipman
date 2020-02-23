@@ -21,6 +21,7 @@ For primary clipboard support, also add `exec wl-paste -p -t text --watch clipma
 
 To query the history and select items, run the binary as `clipman pick -t wofi`. You can assign it to a keybinding: `bindsym $mod+h exec clipman pick -t wofi`.
 For primary clipboard support, `clipman pick -t wofi --histpath="~/.local/share/clipman-primary.json`.
+You can pass additional arguments to the selector like this: `clipman pick --tool wofi -T'--prompt=my-prompt -i'` (both `--prompt` and `-i` are flags of wofi).
 
 To remove items from history, `clipman clear -t wofi` and `clipman clear --all`.
 
