@@ -1,3 +1,13 @@
+# 1.4.0
+
+**New features**
+
+- optional desktop notifications on errors
+
+**Notable bug fixes**
+
+- the toolArgs option now understands complex patterns (spaces, quotes)
+
 # 1.3.0
 
 **Breaking changes**

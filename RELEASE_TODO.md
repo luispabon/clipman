@@ -1,4 +1,0 @@
-- upgrade version number
-	- in main
-	- in man page
-- update changelog

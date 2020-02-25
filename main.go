@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"os/exec"
 	"strings"
@@ -15,11 +14,12 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
-const version = "1.3.0"
+const version = "1.4.0"
 
 var (
 	app      = kingpin.New("clipman", "A clipboard manager for Wayland")
 	histpath = app.Flag("histpath", "Path of history file").Default("~/.local/share/clipman.json").String()
+	alert    = app.Flag("notify", "Send desktop notifications on errors").Bool()
 
 	storer    = app.Command("store", "Record clipboard events (run as argument to `wl-paste --watch`)")
 	maxDemon  = storer.Flag("max-items", "history size").Default("15").Int()
@@ -47,7 +47,7 @@ func main() {
 
 	histfile, history, err := getHistory(*histpath)
 	if err != nil {
-		log.Fatal(err)
+		smartLog(err.Error(), "critical", *alert)
 	}
 
 	switch action {
@@ -59,18 +59,18 @@ func main() {
 			stdin = append(stdin, scanner.Text())
 		}
 		if err := scanner.Err(); err != nil {
-			log.Fatal("Error getting input from stdin.")
+			smartLog("Couldn't get input from stdin.", "critical", *alert)
 		}
 		text := strings.Join(stdin, "\n")
 
 		persist := !*noPersist
 		if err := store(text, history, histfile, *maxDemon, persist); err != nil {
-			log.Fatal(err)
+			smartLog(err.Error(), "critical", *alert)
 		}
 	case "pick":
 		selection, err := selector(history, *maxPicker, *pickTool, "pick", *pickToolArgs)
 		if err != nil {
-			log.Fatal(err)
+			smartLog(err.Error(), "normal", *alert)
 		}
 
 		if selection != "" {
@@ -79,7 +79,7 @@ func main() {
 		}
 	case "restore":
 		if len(history) == 0 {
-			log.Println("Nothing to restore")
+			fmt.Println("Nothing to restore")
 			return
 		}
 
@@ -88,7 +88,7 @@ func main() {
 		// remove all history
 		if *clearAll {
 			if err := wipeAll(histfile); err != nil {
-				log.Fatal(err)
+				smartLog(err.Error(), "normal", *alert)
 			}
 			return
 		}
@@ -100,7 +100,7 @@ func main() {
 
 		selection, err := selector(history, *maxClearer, *clearTool, "clear", *clearToolArgs)
 		if err != nil {
-			log.Fatal(err)
+			smartLog(err.Error(), "normal", *alert)
 		}
 
 		if selection == "" {
@@ -111,7 +111,7 @@ func main() {
 			// there was only one possible item we could select, and we selected it,
 			// so wipe everything
 			if err := wipeAll(histfile); err != nil {
-				log.Fatal(err)
+				smartLog(err.Error(), "normal", *alert)
 			}
 			return
 		}
@@ -123,7 +123,7 @@ func main() {
 		}
 
 		if err := write(filter(history, selection), histfile); err != nil {
-			log.Fatal(err)
+			smartLog(err.Error(), "critical", *alert)
 		}
 	}
 }
@@ -171,12 +171,12 @@ func getHistory(rawPath string) (string, []string, error) {
 func serveTxt(s string) {
 	bin, err := exec.LookPath("wl-copy")
 	if err != nil {
-		log.Printf("couldn't find wl-copy: %v\n", err)
+		smartLog(fmt.Sprintf("couldn't find wl-copy: %v\n", err), "low", *alert)
 	}
 
 	// we mandate the mime type because we know we can only serve text; not doing this leads to weird bugs like #35
 	cmd := exec.Cmd{Path: bin, Args: []string{bin, "-t", "TEXT"}, Stdin: strings.NewReader(s)}
 	if err := cmd.Run(); err != nil {
-		log.Printf("error running wl-copy: %s\n", err)
+		smartLog(fmt.Sprintf("error running wl-copy: %s\n", err), "low", *alert)
 	}
 }
