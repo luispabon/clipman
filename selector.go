@@ -7,9 +7,11 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
+
+	"github.com/kballard/go-shellquote"
 )
 
-func selector(data []string, max int, tool string, prompt string, toolsArgs string) (string, error) {
+func selector(data []string, max int, tool string, prompt string, toolArgs string) (string, error) {
 	if len(data) == 0 {
 		return "", errors.New("nothing to show: no data available")
 	}
@@ -46,7 +48,13 @@ func selector(data []string, max int, tool string, prompt string, toolsArgs stri
 		return "", fmt.Errorf("unsupported tool: %s", tool)
 	}
 
-	args = append(args, strings.Fields(toolsArgs)...)
+	if len(toolArgs) > 0 {
+		targs, err := shellquote.Split(toolArgs)
+		if err != nil {
+			return "", fmt.Errorf("selector: %w", err)
+		}
+		args = append(args, targs...)
+	}
 
 	processed, guide := preprocessData(data, true, false)
 
