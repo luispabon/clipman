@@ -4,15 +4,21 @@ A basic clipboard manager for Wayland, with support for persisting copy buffers 
 
 ## Installing
 
+### From source
+
 Requirements:
 
 - a windows manager that uses `wlr-data-control`, like Sway and other wlroots-based WMs.
 - wl-clipboard >= 2.0
 - either: wofi, bemenu, dmenu or rofi
+- notify-send (optional, for desktop notifications)
 
 [Install go](https://golang.org/doc/install), add `$GOPATH/bin` to your path, then run `go get github.com/yory8/clipman` OR run `go install` inside this folder.
 
-Archlinux users can find a PKGBUILD [here](https://aur.archlinux.org/packages/clipman/).
+### Distros
+
+- Archlinux: unofficial PKGBUILD [here](https://aur.archlinux.org/packages/clipman/).
+- Debian: official package in their repos.
 
 ## Usage
 
