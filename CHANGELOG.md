@@ -1,3 +1,9 @@
+# Next
+
+**Notable bug fixes**
+
+- when using bemenu, the selector didn't work for the oldest element in history
+
 # 1.4.0
 
 **New features**

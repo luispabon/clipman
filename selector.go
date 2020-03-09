@@ -58,7 +58,7 @@ func selector(data []string, max int, tool string, prompt string, toolArgs strin
 
 	processed, guide := preprocessData(data, true, false)
 
-	cmd := exec.Cmd{Path: bin, Args: args, Stdin: strings.NewReader(strings.Join(processed, "\n"))}
+	cmd := exec.Cmd{Path: bin, Args: args, Stdin: strings.NewReader(strings.Join(processed, "\n") + "\n")}
 	cmd.Stderr = os.Stderr // let stderr pass to console
 	b, err := cmd.Output()
 	if err != nil {
