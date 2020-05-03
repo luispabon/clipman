@@ -14,7 +14,7 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
-const version = "1.4.0"
+const version = "1.5.0"
 
 var (
 	app      = kingpin.New("clipman", "A clipboard manager for Wayland")
@@ -27,14 +27,16 @@ var (
 
 	picker       = app.Command("pick", "Pick an item from clipboard history")
 	maxPicker    = picker.Flag("max-items", "scrollview length").Default("15").Int()
-	pickTool     = picker.Flag("tool", "Which selector to use: wofi/bemenu/dmenu/rofi/STDOUT").Short('t').Required().String()
+	pickTool     = picker.Flag("tool", "Which selector to use: wofi/bemenu/CUSTOM/dmenu/rofi/STDOUT").Short('t').Required().String()
 	pickToolArgs = picker.Flag("tool-args", "Extra arguments to pass to the --tool").Short('T').Default("").String()
+	pickEsc      = picker.Flag("print0", "Separate items using NULL; recommended if your tool supports --read0 or similar").Default("false").Bool()
 
 	clearer       = app.Command("clear", "Remove item/s from history")
 	maxClearer    = clearer.Flag("max-items", "scrollview length").Default("15").Int()
-	clearTool     = clearer.Flag("tool", "Which selector to use: wofi/bemenu/dmenu/rofi/STDOUT").Short('t').String()
+	clearTool     = clearer.Flag("tool", "Which selector to use: wofi/bemenu/CUSTOM/dmenu/rofi/STDOUT").Short('t').String()
 	clearToolArgs = clearer.Flag("tool-args", "Extra arguments to pass to the --tool").Short('T').Default("").String()
 	clearAll      = clearer.Flag("all", "Remove all items").Short('a').Default("false").Bool()
+	clearEsc      = clearer.Flag("print0", "Separate items using NULL; recommended if your tool supports --read0 or similar").Default("false").Bool()
 
 	_ = app.Command("restore", "Serve the last recorded item from history")
 )
@@ -68,7 +70,7 @@ func main() {
 			smartLog(err.Error(), "critical", *alert)
 		}
 	case "pick":
-		selection, err := selector(history, *maxPicker, *pickTool, "pick", *pickToolArgs)
+		selection, err := selector(history, *maxPicker, *pickTool, "pick", *pickToolArgs, *pickEsc)
 		if err != nil {
 			smartLog(err.Error(), "normal", *alert)
 		}
@@ -98,7 +100,7 @@ func main() {
 			os.Exit(1)
 		}
 
-		selection, err := selector(history, *maxClearer, *clearTool, "clear", *clearToolArgs)
+		selection, err := selector(history, *maxClearer, *clearTool, "clear", *clearToolArgs, *clearEsc)
 		if err != nil {
 			smartLog(err.Error(), "normal", *alert)
 		}

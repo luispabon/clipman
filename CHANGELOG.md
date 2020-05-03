@@ -1,4 +1,8 @@
-# Next
+# 1.5.0
+
+**New features**
+
+- support custom selectors
 
 **Notable bug fixes**
 

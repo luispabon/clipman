@@ -11,24 +11,27 @@ import (
 	"github.com/kballard/go-shellquote"
 )
 
-func selector(data []string, max int, tool string, prompt string, toolArgs string) (string, error) {
+func selector(data []string, max int, tool, prompt, toolArgs string, null bool) (string, error) {
 	if len(data) == 0 {
 		return "", errors.New("nothing to show: no data available")
 	}
 
 	// output to stdout and return
 	if tool == "STDOUT" {
-		escaped, _ := preprocessData(data, false, true)
-		os.Stdout.WriteString(strings.Join(escaped, "\n"))
+		escaped, _ := preprocessData(data, 0, !null)
+		sep := "\n"
+		if null {
+			sep = "\000"
+		}
+		os.Stdout.WriteString(strings.Join(escaped, sep))
 		return "", nil
 	}
 
-	bin, err := exec.LookPath(tool)
-	if err != nil {
-		return "", fmt.Errorf("%s is not installed", tool)
-	}
+	var (
+		args []string
+		err  error
+	)
 
-	var args []string
 	switch tool {
 	case "dmenu":
 		args = []string{"dmenu", "-b",
@@ -44,11 +47,21 @@ func selector(data []string, max int, tool string, prompt string, toolArgs strin
 			strconv.Itoa(max)}
 	case "wofi":
 		args = []string{"wofi", "-p", prompt, "--cache-file", "/dev/null", "--dmenu"}
+	case "CUSTOM":
+		if len(toolArgs) == 0 {
+			return "", fmt.Errorf("missing tool args for CUSTOM tool")
+		}
+		args, err = shellquote.Split(toolArgs)
+		if err != nil {
+			return "", fmt.Errorf("selector: %w", err)
+		}
 	default:
 		return "", fmt.Errorf("unsupported tool: %s", tool)
 	}
 
-	if len(toolArgs) > 0 {
+	if tool == "CUSTOM" {
+		tool = args[0]
+	} else if len(toolArgs) > 0 {
 		targs, err := shellquote.Split(toolArgs)
 		if err != nil {
 			return "", fmt.Errorf("selector: %w", err)
@@ -56,25 +69,39 @@ func selector(data []string, max int, tool string, prompt string, toolArgs strin
 		args = append(args, targs...)
 	}
 
-	processed, guide := preprocessData(data, true, false)
+	bin, err := exec.LookPath(tool)
+	if err != nil {
+		return "", fmt.Errorf("%s is not installed", tool)
+	}
 
-	cmd := exec.Cmd{Path: bin, Args: args, Stdin: strings.NewReader(strings.Join(processed, "\n") + "\n")}
+	processed, guide := preprocessData(data, 1000, !null)
+	sep := "\n"
+	if null {
+		sep = "\000"
+	}
+
+	cmd := exec.Cmd{Path: bin, Args: args, Stdin: strings.NewReader(strings.Join(processed, sep) + "\n")}
 	cmd.Stderr = os.Stderr // let stderr pass to console
 	b, err := cmd.Output()
 	if err != nil {
-		if err.Error() == "exit status 1" {
-			// dmenu/rofi exits with this error when no selection done
+		if err.Error() == "exit status 1" || err.Error() == "exit status 130" {
+			// dmenu/rofi exits with 1 when no selection done
+			// fzf exits with 1 when no match, 130 when no selection done
 			return "", nil
 		}
 		return "", err
 	}
 
-	// Wofi however does not error when no selection is done
+	// we received no selection; wofi doesn't error in this case
 	if len(b) == 0 {
 		return "", nil
 	}
 
-	sel, ok := guide[string(b[:len(b)-1])] // drop newline added by dmenu/roi/wofi
+	// drop newline added by proper unix tools
+	if b[len(b)-1] == '\n' {
+		b = b[:len(b)-1]
+	}
+	sel, ok := guide[string(b)]
 	if !ok {
 		return "", errors.New("couldn't recover original string")
 	}
@@ -84,28 +111,26 @@ func selector(data []string, max int, tool string, prompt string, toolArgs strin
 
 // preprocessData:
 // - reverses the data
-// - escapes \n (it would break external selectors)
-// - optionally it cuts items longer than 400 bytes (dmenu doesn't allow more than ~1200)
+// - optionally escapes \n and \t (it would break some external selectors)
+// - optionally it cuts items longer than maxChars bytes (dmenu doesn't allow more than ~1200)
 // A guide is created to allow restoring the selected item.
-func preprocessData(data []string, cutting bool, allowTabs bool) ([]string, map[string]string) {
+func preprocessData(data []string, maxChars int, escape bool) ([]string, map[string]string) {
 	var escaped []string
 	guide := make(map[string]string)
 
 	for i := len(data) - 1; i >= 0; i-- { // reverse slice
 		original := data[i]
+		repr := original
 
 		// escape newlines
-		repr := strings.ReplaceAll(original, "\\n", "\\\\n") // preserve literal \n
-		repr = strings.ReplaceAll(repr, "\n", "\\n")
-
-		if !allowTabs {
+		if escape {
+			repr = strings.ReplaceAll(repr, "\\n", "\\\\n") // preserve literal \n
+			repr = strings.ReplaceAll(repr, "\n", "\\n")
 			repr = strings.ReplaceAll(repr, "\\t", "\\\\t")
 			repr = strings.ReplaceAll(repr, "\t", "\\t")
 		}
-
 		// optionally cut to maxChars
-		const maxChars = 400
-		if cutting && len(repr) > maxChars {
+		if maxChars > 0 && len(repr) > maxChars {
 			repr = repr[:maxChars]
 		}
 

@@ -10,7 +10,7 @@ Requirements:
 
 - a windows manager that uses `wlr-data-control`, like Sway and other wlroots-based WMs.
 - wl-clipboard >= 2.0
-- either: wofi, bemenu, dmenu or rofi
+- a selector: wofi, bemenu, dmenu or rofi are specially supported, but you can use what you want
 - notify-send (optional, for desktop notifications)
 
 [Install go](https://golang.org/doc/install), add `$GOPATH/bin` to your path, then run `go get github.com/yory8/clipman` OR run `go install` inside this folder.
@@ -28,6 +28,7 @@ For primary clipboard support, also add `exec wl-paste -p -t text --watch clipma
 To query the history and select items, run the binary as `clipman pick -t wofi`. You can assign it to a keybinding: `bindsym $mod+h exec clipman pick -t wofi`.
 For primary clipboard support, `clipman pick -t wofi --histpath="~/.local/share/clipman-primary.json`.
 You can pass additional arguments to the selector like this: `clipman pick --tool wofi -T'--prompt=my-prompt -i'` (both `--prompt` and `-i` are flags of wofi).
+You can use a custom selector like this: `clipman pick --print0 --tool=CUSTOM --tool-args="fzf --prompt 'pick > ' --bind 'tab:up' --cycle --read0"`.
 
 To remove items from history, `clipman clear -t wofi` and `clipman clear --all`.
 
