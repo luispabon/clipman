@@ -17,8 +17,11 @@ Requirements:
 
 ### Distros
 
-- Archlinux: unofficial PKGBUILD [here](https://aur.archlinux.org/packages/clipman/).
-- Debian: official package in their repos.
+These distros ship with clipman binaries in their repos:
+
+- Alpine
+- Archlinux: unofficial package ([AUR](https://aur.archlinux.org/packages/clipman/))
+- Debian
 
 ## Usage
 
