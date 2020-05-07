@@ -4,6 +4,7 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -57,13 +58,14 @@ func main() {
 		// read copy from stdin
 		var stdin []string
 		scanner := bufio.NewScanner(os.Stdin)
+		scanner.Split(scanLines)
 		for scanner.Scan() {
 			stdin = append(stdin, scanner.Text())
 		}
 		if err := scanner.Err(); err != nil {
 			smartLog("Couldn't get input from stdin.", "critical", *alert)
 		}
-		text := strings.Join(stdin, "\n")
+		text := strings.Join(stdin, "")
 
 		persist := !*noPersist
 		if err := store(text, history, histfile, *maxDemon, persist); err != nil {
@@ -181,4 +183,24 @@ func serveTxt(s string) {
 	if err := cmd.Run(); err != nil {
 		smartLog(fmt.Sprintf("error running wl-copy: %s\n", err), "low", *alert)
 	}
+}
+
+// modified from standard lib to not drop \r and \n
+func scanLines(data []byte, atEOF bool) (advance int, token []byte, err error) {
+	if atEOF && len(data) == 0 {
+		return 0, nil, nil
+	}
+
+	if i := bytes.IndexByte(data, '\n'); i >= 0 {
+		// We have a full newline-terminated line.
+		return i + 1, data[0 : i+1], nil
+	}
+
+	// If we're at EOF, we have a final, non-terminated line. Return it.
+	if atEOF {
+		return len(data), data, nil
+	}
+
+	// Request more data.
+	return 0, nil, nil
 }
