@@ -66,5 +66,5 @@ func write(history []string, histfile string) error {
 		return err
 	}
 
-	return ioutil.WriteFile(histfile, b, 0644)
+	return ioutil.WriteFile(histfile, b, 0600)
 }
