@@ -1,3 +1,10 @@
+# Next
+
+**Notable bug fixes**
+
+- we now store the history under 600 permissions (existing users should changing permissions manually or call `clipman clear -a` to clear the previous file)
+- we don't lose the final newline anymore, nor windows' \r
+
 # 1.5.0
 
 **New features**
