@@ -19,9 +19,7 @@ Requirements:
 
 These distros ship with clipman binaries in their repos:
 
-- Alpine
-- Archlinux: unofficial package ([AUR](https://aur.archlinux.org/packages/clipman/))
-- Debian
+[![Packaging status](https://repology.org/badge/vertical-allrepos/clipman.svg)](https://repology.org/project/clipman/versions)
 
 ## Usage
 
