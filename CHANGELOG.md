@@ -1,4 +1,10 @@
-# 1.5.1 
+# Next
+
+**Notable bug fixes**
+
+- fzf couldn't recover the clipboard content in some cases
+
+# 1.5.1
 
 **Notable bug fixes**
 

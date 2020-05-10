@@ -80,7 +80,7 @@ func selector(data []string, max int, tool, prompt, toolArgs string, null bool) 
 		sep = "\000"
 	}
 
-	cmd := exec.Cmd{Path: bin, Args: args, Stdin: strings.NewReader(strings.Join(processed, sep) + "\n")}
+	cmd := exec.Cmd{Path: bin, Args: args, Stdin: strings.NewReader(strings.Join(processed, sep))}
 	cmd.Stderr = os.Stderr // let stderr pass to console
 	b, err := cmd.Output()
 	if err != nil {
