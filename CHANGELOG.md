@@ -2,6 +2,7 @@
 
 **Notable bug fixes**
 
+- wl-copy is now truly daemonized, allowing calling `alacritty -e sh -c clipman pick`
 - fzf couldn't recover the clipboard content in some cases
 
 # 1.5.1
