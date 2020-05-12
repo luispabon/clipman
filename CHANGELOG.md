@@ -1,4 +1,4 @@
-# Next
+# 1.5.2
 
 **Notable bug fixes**
 
