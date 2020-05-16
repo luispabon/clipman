@@ -26,6 +26,7 @@ var (
 	storer    = app.Command("store", "Record clipboard events (run as argument to `wl-paste --watch`)")
 	maxDemon  = storer.Flag("max-items", "history size").Default("15").Int()
 	noPersist = storer.Flag("no-persist", "Don't persist a copy buffer after a program exits").Short('P').Default("false").Bool()
+	unix      = storer.Flag("unix", "Normalize line endings to LF").Bool()
 
 	picker       = app.Command("pick", "Pick an item from clipboard history")
 	maxPicker    = picker.Flag("max-items", "scrollview length").Default("15").Int()
@@ -200,14 +201,43 @@ func scanLines(data []byte, atEOF bool) (advance int, token []byte, err error) {
 
 	if i := bytes.IndexByte(data, '\n'); i >= 0 {
 		// We have a full newline-terminated line.
-		return i + 1, data[0 : i+1], nil
+		b := data[0 : i+1]
+		if *unix {
+			b = dropCR(b)
+		}
+		return i + 1, b, nil
 	}
 
 	// If we're at EOF, we have a final, non-terminated line. Return it.
 	if atEOF {
-		return len(data), data, nil
+		b := data
+		if *unix {
+			b = dropCR(b)
+		}
+		return len(data), b, nil
 	}
 
 	// Request more data.
 	return 0, nil, nil
+}
+
+// dropCR drops a terminal \r from the data. Modified from Go's Stdlib
+func dropCR(data []byte) []byte {
+	orig := data
+
+	var lf bool
+	if len(data) > 0 && data[len(data)-1] == '\n' {
+		lf = true
+		data = data[0 : len(data)-1]
+	}
+
+	if len(data) > 0 && data[len(data)-1] == '\r' {
+		b := data[0 : len(data)-1]
+		if lf {
+			b = append(b, '\n')
+		}
+		return b
+	}
+
+	return orig
 }
