@@ -1,3 +1,9 @@
+# Next
+
+**New features**
+
+- `--unix` option to normalize all line endings to LF
+
 # 1.5.2
 
 **Notable bug fixes**
