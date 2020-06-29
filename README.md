@@ -44,6 +44,10 @@ For more options: `clipman -h`.
 - All items stored in history are treated as plain text.
 - By default, we continue serving the last copied item even after its owner has exited. This means that, unless you run with the `--no-persist` option, you'll always immediately lose rich content: for example, if you copy formatted text inside Libre Office you'll lose all formatting on paste; or, if you copy a bookmark in Firefox, you won't be able to paste it in another bookmark folder.
 
+### Vim's Visual Block mode breaks if persistence is enabled
+
+Run `clipman store` with the `--no-persist` option if you are affected. Unfortunately, it seems that there is no way to make them play well together.
+
 ## Versions
 
 This projects follows SemVer conventions.

@@ -90,6 +90,10 @@ To remove items from history, `clipman clear -t wofi` and `clipman clear --all`.
 .PP
 To serve the last history item at startup, add `exec clipman restore` to your Sway config.
 .SH "KNOWN ISSUES"
-All items stored in history are treated as plain text.
+\fBAll items stored in history are treated as plain text.\fR
 .PP
 By default, we continue serving the last copied item even after its owner has exited. This means that, unless you run with the `--no-persist` option, you'll always immediately lose rich content: for example, if you copy formatted text inside Libre Office you'll lose all formatting on paste; or, if you copy a bookmark in Firefox, you won't be able to paste it in another bookmark folder.
+.PP
+\fBVim's Visual Block mode breaks if persistence is enabled\fR
+.PP
+Run `clipman store` with the `--no-persist` option if you are affected. Unfortunately, it seems that there is no way to make them play well together.
