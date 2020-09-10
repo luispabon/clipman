@@ -23,7 +23,9 @@ These distros ship with clipman binaries in their repos:
 
 ## Usage
 
-Run the binary in your Sway session by adding `exec wl-paste -t text --watch clipman store` (or `exec wl-paste -t text --watch clipman store 1>> PATH/TO/LOGFILE 2>&1 &` to log errors) at the beginning of your config. If you want primary clipboard support, add the `-p` flag to the `wl-paste` command; note that primary and secondary clipboard will be mixed together.
+Run the binary in your Sway session by adding `exec wl-paste -t text --watch clipman store` (or `exec wl-paste -t text --watch clipman store 1>> PATH/TO/LOGFILE 2>&1 &` to log errors) at the beginning of your config.
+
+For primary clipboard support, also add `exec wl-paste -p -t text --watch clipman store -P --histpath="~/.local/share/clipman-primary.json` (note that both the `-p` in wl-paste and the `-P` in clipman are mandatory in this case).
 
 To query the history and select items, run the binary as `clipman pick -t wofi`. You can assign it to a keybinding: `bindsym $mod+h exec clipman pick -t wofi`.
 You can pass additional arguments to the selector like this: `clipman pick --tool wofi -T'--prompt=my-prompt -i'` (both `--prompt` and `-i` are flags of wofi).
